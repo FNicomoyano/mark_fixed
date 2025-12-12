@@ -1,22 +1,76 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>AR Verification - Desk</title>
+    <title>IFC Visor - 1:1 Scale</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    
+    <script>
+      AFRAME.registerComponent('opacity-control', {
+        init: function () {
+          const slider = document.getElementById('opacityRange');
+          const model = this.el;
+
+          slider.addEventListener('input', (e) => {
+            const opacity = e.target.value / 100;
+            
+            // Traverse the 3D model to find all "Mesh" parts and fade them
+            const mesh = model.getObject3D('mesh');
+            if (mesh) {
+              mesh.traverse((node) => {
+                if (node.isMesh) {
+                  node.material.transparent = true;
+                  node.material.opacity = opacity;
+                }
+              });
+            }
+          });
+        }
+      });
+    </script>
+
+    <style>
+      /* Slider UI Styling */
+      .slider-container {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+      }
+      input[type=range] {
+        width: 100%;
+      }
+      label {
+        color: white;
+        font-family: sans-serif;
+        font-size: 1.2rem;
+      }
+    </style>
   </head>
   
   <body style="margin : 0px; overflow: hidden;">
     
+    <div class="slider-container">
+      <label>Transparency (Comparison)</label>
+      <input type="range" id="opacityRange" min="0" max="100" value="100">
+    </div>
+
     <a-scene embedded arjs>
       
       <a-marker preset="hiro">
-          
           <a-entity 
+            id="myModel"
             position="0 0 0" 
-            scale="0.5 0.5 0.5"
+            scale="1 1 1"
             rotation="0 0 0"
-            gltf-model="./Desk.glb">
+            gltf-model="./Desk.glb"
+            opacity-control>
           </a-entity>
 
       </a-marker>
